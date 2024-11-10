@@ -1,21 +1,15 @@
 package edu.praktikum.sprint7;
 
 import edu.praktikum.sprint7.models.Order;
+import edu.praktikum.sprint7.utils.OrderUtils;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
 public class OrderCreationTest {
@@ -29,10 +23,10 @@ public class OrderCreationTest {
     private final String comment;
     private final String[] inputColors;
 
-    // Конструктор для параметризации
+
     public OrderCreationTest(String firstName, String lastName, String address, String metroStation,
-                     String phoneNumber, int rentTime, String deliveryDate, String comment,
-                     String[] inputColors) {
+                             String phoneNumber, int rentTime, String deliveryDate, String comment,
+                             String[] inputColors) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -44,7 +38,7 @@ public class OrderCreationTest {
         this.inputColors = inputColors;
     }
 
-    @Parameterized.Parameters // Параметры для тестов
+    @Parameterized.Parameters
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 {"Иван", "Иванов", "Москва, ул. Ленина, д. 1", "Киевская", "+79001234567", 5, "2023-10-01", "Комментарий", new String[]{"BLACK"}},
@@ -53,11 +47,6 @@ public class OrderCreationTest {
                 {"Александр", "Александров", "Москва, ул. Академика, д. 4", "Щелковская", "+79001234570", 1, "2023-10-04", "Комментарий", null}
         });
     }
-    @Before
-    public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
-    }
-
 
     @Test
     @DisplayName("Создание заказа")
@@ -65,20 +54,12 @@ public class OrderCreationTest {
         Order order = new Order(firstName, lastName, address, metroStation,
                 phoneNumber, rentTime, deliveryDate, comment, inputColors);
 
+        Response response = OrderUtils.createOrder(order);
 
-        Response response = given()
-                .contentType("application/json")
-                .body(order.toJson())
-                .when()
-                .post("api/v1/orders")
-                .then()
-                .statusCode(201) // Ожидаем, что статус ответа будет 201 Created
-                .extract()
-                .response();
-
-        // Проверяем, что ответ содержит поле track
-        String responseBody = response.getBody().asString();
-        assertNotNull("Тело ответа не должно быть пустым", responseBody);
-        assertThat(responseBody, containsString("track"));
+        try {
+            OrderUtils.checkResponse(response, 201);
+        } finally {
+            OrderUtils.logResponse(response);
+        }
     }
 }

@@ -1,103 +1,117 @@
 package edu.praktikum.sprint7;
 
+import edu.praktikum.sprint7.models.Courier;
 import edu.praktikum.sprint7.utils.Utils;
 import io.qameta.allure.junit4.DisplayName;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
-
-import static org.junit.Assert.*;
-
 public class CourierLoginTest {
 
+    private Courier courier;
     private String createdCourierId;
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://qa-scooter.praktikum-services.ru";
+        // Генерация и создание одного курьера перед тестами
+        courier = Utils.generateCourierData(true, true, true);
+        Response response = Utils.createCourier(courier);
+
+        // Проверка на успешность создания курьера
+        if (response.statusCode() != 201) {
+            throw new IllegalStateException("Не удалось создать курьера: " + response.getBody().asString());
+        }
+        createdCourierId = Utils.loginCourier(courier);
     }
 
     @Test
     @DisplayName("Логин курьера")
     public void courierCanLogin() {
-        Map<String, String> credentials = Utils.createCourier();
-        String login = credentials.get("login");
-        String password = credentials.get("password");
-
-        // Логинимся
-        createdCourierId = Utils.loginCourier(login, password);
-        assertNotNull("ID курьера должен быть не null", createdCourierId);
+        Response response = Utils.loginCourierWithResponse(courier);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 200, null);
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
     @DisplayName("Логин курьера с неправильным паролем")
     public void loginWithWrongPassword() {
-        Map<String, String> credentials = Utils.createCourier();
-        String correctLogin = credentials.get("login");
-
-        String incorrectPassword = "wrongPassword";
-        Response response = Utils.loginCourierWithResponse(correctLogin, incorrectPassword);
-        assertEquals("Неверный статус код для логина с неправильным паролем", 404, response.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", response.body().asString().contains("Учетная запись не найдена"));
+        Courier courierWithWrongPassword = new Courier(courier.getLogin(), "invalid_password", courier.getFirstName());
+        Response response = Utils.loginCourierWithResponse(courierWithWrongPassword);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 404, "Учетная запись не найдена"); // Проверяем статус код 404
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
     @DisplayName("Логин курьера с неправильным логином")
     public void loginWithWrongLogin() {
-        Map<String, String> credentials = Utils.createCourier();
-        String correctPassword = credentials.get("password");
-
-        String incorrectLogin = "wrongLogin";
-        Response responseWithWrongLogin = Utils.loginCourierWithResponse(incorrectLogin, correctPassword);
-        assertEquals("Неверный статус код для логина с неправильным логином", 404, responseWithWrongLogin.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", responseWithWrongLogin.body().asString().contains("Учетная запись не найдена"));
+        Courier courierWithWrongLogin = new Courier("invalidLogin", courier.getPassword(), courier.getFirstName());
+        Response response = Utils.loginCourierWithResponse(courierWithWrongLogin);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 404, "Учетная запись не найдена"); // Проверяем статус код 404
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
     @DisplayName("Логин курьера без логина")
     public void loginWithoutLogin() {
-        Response responseWithoutLogin = Utils.loginCourierWithResponse("", "anyPassword");
-        assertEquals("Неверный статус код для логина без логина", 400, responseWithoutLogin.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", responseWithoutLogin.body().asString().contains("Недостаточно данных для входа"));
+        Courier courierWithoutLogin = new Courier(null, courier.getPassword(), courier.getFirstName());
+        Response response = Utils.loginCourierWithResponse(courierWithoutLogin);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 400, "Недостаточно данных для входа"); // Проверяем статус код 400
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
     @DisplayName("Логин курьера без пароля")
     public void loginWithoutPassword() {
-        Map<String, String> credentials = Utils.createCourier();
-        String login = credentials.get("login");
-
-        Response responseWithoutPassword = Utils.loginCourierWithResponse(login, "");
-        assertEquals("Неверный статус код для логина без пароля", 400, responseWithoutPassword.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", responseWithoutPassword.body().asString().contains("Недостаточно данных для входа"));
+        Courier courierWithoutPassword = new Courier(courier.getLogin(), null, courier.getFirstName());
+        Response response = Utils.loginCourierWithResponse(courierWithoutPassword);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 400, "Недостаточно данных для входа");
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
     @DisplayName("Логин курьера без логина и пароля")
     public void loginWithoutLoginAndPassword() {
-        Response responseWithoutPasswordAndLogin = Utils.loginCourierWithResponse("", "");
-        assertEquals("Неверный статус код для логина без пароля и логина", 400, responseWithoutPasswordAndLogin.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", responseWithoutPasswordAndLogin.body().asString().contains("Недостаточно данных для входа"));
+        Courier courierWithoutCredentials = new Courier(null, null, null);
+        Response response = Utils.loginCourierWithResponse(courierWithoutCredentials);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 400, "Недостаточно данных для входа");
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @Test
-    @DisplayName("Логин несущесутвующего курьера")
+    @DisplayName("Логин несуществующего курьера")
     public void loginNonExistentCourier() {
-        String nonExistentLogin = "nonExistent";
-        String nonExistentPassword = "nonExistentPassword";
-
-        Response response = Utils.loginCourierWithResponse(nonExistentLogin, nonExistentPassword);
-        assertEquals("Неверный статус код для входа несуществующего курьера", 404, response.statusCode());
-        assertTrue("Ответ не содержит сообщение об ошибке", response.body().asString().contains("Учетная запись не найдена"));
+        Courier nonExistentCourier = new Courier("non_existent_login", "non_existent_password", null);
+        Response response = Utils.loginCourierWithResponse(nonExistentCourier);
+        try {
+            Utils.checkStatusCodeAndResponse(response, 404, "Учетная запись не найдена");
+        } finally {
+            Utils.logResponse(response);
+        }
     }
 
     @After
     public void tearDown() {
-        // Удаляем курьера после выполнения тестов
+
         if (createdCourierId != null) {
             Utils.deleteCourier(createdCourierId);
         }

@@ -1,0 +1,10 @@
+Response Status Code: 404
+Headers: Access-Control-Allow-Origin=*
+Content-Length=72
+Content-Type=application/json; charset=utf-8
+Date=Sun, 10 Nov 2024 00:56:30 GMT
+ETag=W/"48-SNOWaDub1LGYtleYI6ITphu8xIQ"
+Set-Cookie=_yasc=BbnWNP/FSjLl95zG+rtVn2TObGUrPGjX6Woh79yP3pNj+9/gMKLcDHYkbfCdzWgL; domain=.praktikum-services.ru; path=/; expires=Wed, 08 Nov 2034 00:56:30 GMT; secure
+X-Powered-By=Express
+X-Request-Id=1731200190887260-11521885111947730906
+Body: {"code":404,"message":"Учетная запись не найдена"}

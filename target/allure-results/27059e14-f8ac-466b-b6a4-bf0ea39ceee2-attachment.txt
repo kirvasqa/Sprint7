@@ -1,0 +1,10 @@
+Response Status Code: 400
+Headers: Access-Control-Allow-Origin=*
+Content-Length=114
+Content-Type=application/json; charset=utf-8
+Date=Sun, 10 Nov 2024 00:58:35 GMT
+ETag=W/"72-AUDx41VLe1HSztSRMybiiyHwcKY"
+Set-Cookie=_yasc=X2unqzQsk1yLHiT+xknTadTi2/a8wNdlQgHTV9fcbdBMWnb0jlZRbCfH2LVGA0ldFw==; domain=.praktikum-services.ru; path=/; expires=Wed, 08 Nov 2034 00:58:35 GMT; secure
+X-Powered-By=Express
+X-Request-Id=1731200315458498-79756865073511001
+Body: {"code":400,"message":"Недостаточно данных для создания учетной записи"}
