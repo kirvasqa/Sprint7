@@ -1,0 +1,10 @@
+Response Status Code: 201
+Headers: Access-Control-Allow-Origin=*
+Content-Length=16
+Content-Type=application/json; charset=utf-8
+Date=Sun, 10 Nov 2024 00:58:39 GMT
+ETag=W/"10-iB2x7j9Ta9eZCcVOdt/qX2Y1Ijc"
+Set-Cookie=_yasc=BEbgtWPjy22OTT0NyE8FpT3Ikrpp7HyosoDvYbDv1Mxl9+Cpv9uVKbjepLX5qSSD; domain=.praktikum-services.ru; path=/; expires=Wed, 08 Nov 2034 00:58:39 GMT; secure
+X-Powered-By=Express
+X-Request-Id=1731200319282808-923905950465235029
+Body: {"track":180100}

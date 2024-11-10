@@ -1,0 +1,10 @@
+Response Status Code: 409
+Headers: Access-Control-Allow-Origin=*
+Content-Length=112
+Content-Type=application/json; charset=utf-8
+Date=Sun, 10 Nov 2024 00:58:36 GMT
+ETag=W/"70-sLG1ZktNk+Ab3iaKUMwxkdL4FJo"
+Set-Cookie=_yasc=2oB2/zZ2gId5BfztGhnAtSIVkHdNFYZA+vFU2NSVxQyr3xeEuHOxVDbK1HxUTIfdWw==; domain=.praktikum-services.ru; path=/; expires=Wed, 08 Nov 2034 00:58:36 GMT; secure
+X-Powered-By=Express
+X-Request-Id=1731200316153549-16764241085390131852
+Body: {"code":409,"message":"Этот логин уже используется. Попробуйте другой."}
